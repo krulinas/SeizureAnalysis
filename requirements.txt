@@ -4,3 +4,4 @@ scikit-learn
 plotly
 numpy
 scipy
+kaleido
