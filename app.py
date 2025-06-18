@@ -17,21 +17,22 @@ st.markdown("""
     <style>
     .stApp {
         background: linear-gradient(135deg, #4B1D3F, #2C0C36) !important;
+        background-attachment: fixed;
         color: white;
     }
-    body {
-        color: white;
+
+    body, .block-container, .css-18e3th9, .css-1d391kg {
+        background-color: transparent !important;
     }
+
     h1, h2, h3 {
         color: #FACC15;
     }
+
     [data-testid="metric-container"] {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         padding: 15px;
-    }
-    .css-18e3th9, .css-1d391kg {
-        background-color: transparent !important;
     }
     </style>
 """, unsafe_allow_html=True)
