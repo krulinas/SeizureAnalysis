@@ -149,6 +149,21 @@ if show_prediction:
     if show_male: predict_daly("Male")
     if show_female: predict_daly("Female")
 
+
+# Accuracy R2 SCORE
+from sklearn.metrics import r2_score
+
+if show_prediction:
+    st.markdown("### 📏 Prediction Quality (R² Score)")
+
+    if show_male and "DALY Male 2025" in df:
+        r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
+        st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
+
+    if show_female and "DALY Female 2025" in df:
+        r2_female = r2_score(df["DALY Female"], df["DALY Female 2025"])
+        st.markdown(f"🟣 **Female R² Score**: `{r2_female:.2f}`")
+
 # --- TABS ---
 tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧠 ML Insights", "📦 Data & Tools"])
 
@@ -217,6 +232,28 @@ with tab2:
         df["Cluster"] = kmeans.labels_
         cluster_fig = px.scatter(df, x="DALY Male", y="DALY Female", color="Cluster", title="Gender DALY Clustering")
         st.plotly_chart(cluster_fig, use_container_width=True)
+
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    st.markdown("### 🔥 Correlation Heatmap")
+
+    # Only include relevant numeric columns
+    heatmap_data = df.select_dtypes(include=[np.number])
+    corr = heatmap_data.corr()
+
+    fig, ax = plt.subplots()
+    sns.heatmap(corr, annot=True, cmap="Reds", fmt=".2f", ax=ax)
+    st.pyplot(fig)
+
+    st.markdown("### 📊 Distribution of DALY by Gender")
+    fig2 = go.Figure()
+    if show_male:
+        fig2.add_trace(go.Box(y=df["DALY Male"], name="Male", boxpoints="all", marker_color="blue"))
+    if show_female:
+        fig2.add_trace(go.Box(y=df["DALY Female"], name="Female", boxpoints="all", marker_color="violet"))
+
+    st.plotly_chart(fig2, use_container_width=True)
 
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
