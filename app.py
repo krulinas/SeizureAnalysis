@@ -97,7 +97,10 @@ show_female = st.sidebar.checkbox("👩 Show Female", True)
 show_prediction = st.sidebar.checkbox("🔮 Show 2025 Prediction", True)
 show_cluster = st.sidebar.checkbox("🧬 Cluster Analysis", False)
 chart_style = st.sidebar.radio("📈 Chart Style", ["Line", "Bar"])
-selected_group = st.sidebar.multiselect("🔎 Filter by Age Group", [])
+selected_group = st.sidebar.multiselect(
+    "🔎 Filter by Age Group",
+    options=sorted(df["Age Group"].unique().tolist())
+)
 
 # --- DATA LOAD & PREP ---
 df = pd.read_csv("epilepsy_daly_by_age_2019.csv")
