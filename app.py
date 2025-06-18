@@ -81,6 +81,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
 # --- HEADER ---
 st.markdown("<h1>🧠 NeuroPulse++</h1>", unsafe_allow_html=True)
 st.markdown("AI-powered dashboard for epilepsy DALY prediction, clustering, and human insight.")
@@ -89,9 +90,7 @@ st.markdown("---")
 
 # --- SIDEBAR CONTROLS ---
 st.sidebar.title("⚙️ Settings")
-theme = st.sidebar.selectbox("🌓 Theme", ["Dark", "Light"])
-if theme == "Light":
-    st.markdown("<style>body{background:#fff; color:#000}</style>", unsafe_allow_html=True)
+st.sidebar.markdown("🎨 **Theme: Premium Coral Red**")  # Replaces theme dropdown
 
 show_male = st.sidebar.checkbox("👨 Show Male", True)
 show_female = st.sidebar.checkbox("👩 Show Female", True)
