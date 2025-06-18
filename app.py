@@ -15,28 +15,70 @@ st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wi
 # --- CUSTOM STYLES ---
 st.markdown("""
     <style>
+    /* App main background */
     .stApp {
-        background-color: #2C0C36 !important;
-        color: white;
+        background-color: #FAFFF0 !important;
+        color: #333;
+        font-family: 'Segoe UI', sans-serif;
     }
-    h1 {
-        color: #FACC15;
-        text-shadow: 0 0 8px #FACC15;
-    }
-    h2, h3 {
-        color: #FACC15;
-    }
+
+    /* Sidebar / Drawer */
     .css-1d391kg {
-        background: rgba(44, 12, 54, 0.8) !important;
-        backdrop-filter: blur(8px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: #FF9FA2 !important;
+        backdrop-filter: blur(6px);
+        border-right: 1px solid #FF6968;
     }
+
+    /* Header text (title) */
+    h1, h2, h3 {
+        color: #FF6968;
+    }
+
+    /* Metric card background */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.08);
+        background-color: #EB5456;
+        color: white;
         border-radius: 12px;
-        box-shadow: 0 0 10px rgba(250, 204, 21, 0.1);
         padding: 15px;
+        box-shadow: 0 0 10px rgba(216, 76, 76, 0.3);
     }
+
+    /* Highlighted sections like tabs */
+    .stTabs [role="tablist"] {
+        background: #FF9FA2;
+        border-radius: 10px;
+    }
+
+    .stTabs [role="tab"] {
+        background-color: transparent;
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    .stTabs [aria-selected="true"] {
+        border-bottom: 4px solid #D84C4C;
+        color: #D84C4C;
+    }
+
+    /* Buttons */
+    .stButton>button {
+        background-color: #D84C4C;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+    }
+    .stButton>button:hover {
+        background-color: #B43E3E;
+        transition: 0.3s ease-in-out;
+    }
+
+    /* File uploader and inputs */
+    .css-1cpxqw2 {
+        background-color: #FFF6F6 !important;
+        border: 1px solid #FF6968 !important;
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
