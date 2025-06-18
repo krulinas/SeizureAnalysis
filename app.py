@@ -15,9 +15,11 @@ st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wi
 # --- CUSTOM STYLES ---
 st.markdown("""
     <style>
+    .stApp {
+        background: linear-gradient(135deg, #4B1D3F, #2C0C36) !important;
+        color: white;
+    }
     body {
-        font-family: 'Segoe UI';
-        background: linear-gradient(to bottom right, #4B1D3F, #2C0C36);
         color: white;
     }
     h1, h2, h3 {
@@ -28,8 +30,8 @@ st.markdown("""
         border-radius: 10px;
         padding: 15px;
     }
-    .stApp {
-        background: linear-gradient(to bottom right, #4B1D3F, #2C0C36);
+    .css-18e3th9, .css-1d391kg {
+        background-color: transparent !important;
     }
     </style>
 """, unsafe_allow_html=True)
