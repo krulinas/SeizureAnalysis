@@ -15,49 +15,47 @@ st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wi
 # --- CUSTOM STYLES ---
 st.markdown("""
     <style>
-    /* App main background */
+    /* Main background */
     .stApp {
-        background-color: #FAFFF0 !important;
-        color: #333;
+        background-color: #2E0F15 !important;
+        color: #FAFFF0 !important;
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Sidebar / Drawer */
+    /* Sidebar */
     .css-1d391kg {
-        background-color: #FF9FA2 !important;
+        background-color: #842C35 !important;
         backdrop-filter: blur(6px);
-        border-right: 1px solid #FF6968;
+        color: #FAFFF0 !important;
+        border-right: 1px solid #EB5456;
     }
 
-    /* Header text (title) */
+    /* Headings */
     h1, h2, h3 {
-        color: #FF6968;
+        color: #FF9FA2;
     }
 
-    /* Metric card background */
+    /* Metrics */
     [data-testid="metric-container"] {
         background-color: #EB5456;
-        color: white;
+        color: #FAFFF0;
         border-radius: 12px;
         padding: 15px;
         box-shadow: 0 0 10px rgba(216, 76, 76, 0.3);
     }
 
-    /* Highlighted sections like tabs */
+    /* Tabs */
     .stTabs [role="tablist"] {
-        background: #FF9FA2;
+        background: #842C35;
         border-radius: 10px;
     }
-
     .stTabs [role="tab"] {
-        background-color: transparent;
+        color: #FAFFF0;
         padding: 10px;
-        font-weight: bold;
     }
-
     .stTabs [aria-selected="true"] {
-        border-bottom: 4px solid #D84C4C;
-        color: #D84C4C;
+        border-bottom: 4px solid #FF6968;
+        color: #FF9FA2;
     }
 
     /* Buttons */
@@ -73,10 +71,11 @@ st.markdown("""
         transition: 0.3s ease-in-out;
     }
 
-    /* File uploader and inputs */
+    /* Inputs */
     .css-1cpxqw2 {
-        background-color: #FFF6F6 !important;
-        border: 1px solid #FF6968 !important;
+        background-color: #3A1D20 !important;
+        border: 1px solid #EB5456 !important;
+        color: white !important;
     }
 
     </style>
