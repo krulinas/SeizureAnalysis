@@ -90,13 +90,19 @@ st.markdown("---")
 
 # --- SIDEBAR CONTROLS ---
 st.sidebar.title("⚙️ Settings")
-st.sidebar.markdown("🎨 **Theme: Premium Coral Red**")  # Replaces theme dropdown
+st.sidebar.markdown("""
+<div style='font-size:16px; font-weight:bold; color:#FF9FA2; padding: 6px 0;'>
+🎨 Theme: Premium Coral Red
+</div>
+""", unsafe_allow_html=True)
 
 show_male = st.sidebar.checkbox("👨 Show Male", True)
 show_female = st.sidebar.checkbox("👩 Show Female", True)
 show_prediction = st.sidebar.checkbox("🔮 Show 2025 Prediction", True)
 show_cluster = st.sidebar.checkbox("🧬 Cluster Analysis", False)
 chart_style = st.sidebar.radio("📈 Chart Style", ["Line", "Bar"])
+
+# 👇 Move this here after df is loaded
 selected_group = st.sidebar.multiselect(
     "🔎 Filter by Age Group",
     options=sorted(df["Age Group"].unique().tolist())
