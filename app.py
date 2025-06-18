@@ -133,7 +133,7 @@ def load_data():
     df["DALY Male 2015"] = df["DALY Male"] * 1.05
     df["DALY Female 2015"] = df["DALY Female"] * 1.08
     age_groups = df["Age Group"]
-    return df
+    return df, age_groups
 
 df = load_data()
 
