@@ -86,6 +86,27 @@ st.markdown("""
 st.markdown("<h1>🧠 NeuroPulse++</h1>", unsafe_allow_html=True)
 st.markdown("AI-powered dashboard for epilepsy DALY prediction, clustering, and human insight.")
 st.caption("📊 Source: WHO Global Health Estimates (2019)")
+with st.expander("ℹ️ About This Dashboard"):
+    st.markdown("""
+    **What is Epilepsy?**  
+    Epilepsy is a brain disorder that causes repeated seizures. Seizures are sudden bursts of electrical activity in the brain that can affect behavior, movement, or awareness.
+
+    **What is a Seizure?**  
+    A seizure is like a short circuit in the brain. It can cause jerking movements, confusion, staring spells, or even loss of consciousness — depending on the type.
+
+    **What is DALY?**  
+    DALY stands for *Disability-Adjusted Life Year*. It measures how much healthy life is lost due to illness or death. The higher the number, the bigger the impact of epilepsy on a person's life.
+
+    **What does this dashboard do?**  
+    This dashboard shows epilepsy data for different age groups. It lets you:
+    - View current and past epilepsy burden
+    - Predict future trends using machine learning
+    - Explore patterns by age and gender
+
+    **What ML (Machine Learning) is used?**  
+    A simple method called **Linear Regression** is used here to predict future values. It looks at trends from the past and draws a line to guess future numbers.
+    """)
+
 st.markdown("---")
 
 # --- SIDEBAR CONTROLS ---
