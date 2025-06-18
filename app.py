@@ -7,6 +7,7 @@ from sklearn.metrics import r2_score
 from scipy.stats import zscore
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
 from io import BytesIO
 import os
 import seaborn as sns
@@ -284,7 +285,7 @@ with tab3:
         st.download_button("⬇️ Download CSV", df.to_csv(index=False), file_name="neuropulse_data.csv")
     with col2:
         img = BytesIO()
-        fig.write_image(img, format="png")
+        pio.write_image(img, format="png")
         st.download_button("🖼️ Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
 
     st.subheader("🔎 View Full Data Table")
