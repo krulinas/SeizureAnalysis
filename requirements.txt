@@ -8,3 +8,5 @@ kaleido
 openai
 langchain
 langchain-experimental
+seaborn
+matplotlib
