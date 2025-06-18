@@ -135,7 +135,7 @@ def load_data():
     age_groups = df["Age Group"]
     return df, age_groups
 
-df = load_data()
+df, age_groups = load_data()
 
 selected_group = st.sidebar.multiselect(
     "🔎 Filter by Age Group",
