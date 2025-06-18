@@ -102,21 +102,17 @@ show_prediction = st.sidebar.checkbox("🔮 Show 2025 Prediction", True)
 show_cluster = st.sidebar.checkbox("🧬 Cluster Analysis", False)
 chart_style = st.sidebar.radio("📈 Chart Style", ["Line", "Bar"])
 
-# 👇 Move this here after df is loaded
-selected_group = st.sidebar.multiselect(
-    "🔎 Filter by Age Group",
-    options=sorted(df["Age Group"].unique().tolist())
-)
-
 # --- DATA LOAD & PREP ---
 df = pd.read_csv("epilepsy_daly_by_age_2019.csv")
 df["DALY Male 2015"] = df["DALY Male"] * 1.05
 df["DALY Female 2015"] = df["DALY Female"] * 1.08
 age_groups = df["Age Group"]
 
-# --- Apply Filters ---
-if selected_group:
-    df = df[df["Age Group"].isin(selected_group)]
+# ✅ put this here
+selected_group = st.sidebar.multiselect(
+    "🔎 Filter by Age Group",
+    options=sorted(df["Age Group"].unique().tolist())
+)
 
 # --- PREDICTION ---
 def predict_daly(gender):
