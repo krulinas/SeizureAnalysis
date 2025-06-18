@@ -132,7 +132,8 @@ def load_data():
     df = pd.read_csv("epilepsy_daly_by_age_2019.csv")
     df["DALY Male 2015"] = df["DALY Male"] * 1.05
     df["DALY Female 2015"] = df["DALY Female"] * 1.08
-    return df
+    age_groups = df["Age Group"]
+    return df, age_groups
 
 df = load_data()
 
