@@ -16,22 +16,25 @@ st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wi
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #4B1D3F, #2C0C36) !important;
-        background-attachment: fixed;
+        background-color: #2C0C36 !important;
         color: white;
     }
-
-    body, .block-container, .css-18e3th9, .css-1d391kg {
-        background-color: transparent !important;
+    h1 {
+        color: #FACC15;
+        text-shadow: 0 0 8px #FACC15;
     }
-
-    h1, h2, h3 {
+    h2, h3 {
         color: #FACC15;
     }
-
+    .css-1d391kg {
+        background: rgba(44, 12, 54, 0.8) !important;
+        backdrop-filter: blur(8px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(250, 204, 21, 0.1);
         padding: 15px;
     }
     </style>
