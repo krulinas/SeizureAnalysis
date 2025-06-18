@@ -8,6 +8,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from io import BytesIO
 import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+from langchain_experimental.agents import create_pandas_dataframe_agent
+from langchain.chat_models import ChatOpenAI
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wide")
@@ -124,15 +128,18 @@ show_cluster = st.sidebar.checkbox("🧬 Cluster Analysis", False)
 chart_style = st.sidebar.radio("📈 Chart Style", ["Line", "Bar"])
 
 # --- DATA LOAD & PREP ---
-df = pd.read_csv("epilepsy_daly_by_age_2019.csv")
-df["DALY Male 2015"] = df["DALY Male"] * 1.05
-df["DALY Female 2015"] = df["DALY Female"] * 1.08
-age_groups = df["Age Group"]
+def load_data():
+    df = pd.read_csv("epilepsy_daly_by_age_2019.csv")
+    df["DALY Male 2015"] = df["DALY Male"] * 1.05
+    df["DALY Female 2015"] = df["DALY Female"] * 1.08
+    return df
 
-# ✅ put this here
+df = load_data()
+
 selected_group = st.sidebar.multiselect(
     "🔎 Filter by Age Group",
-    options=sorted(df["Age Group"].unique().tolist())
+    options=sorted(df["Age Group"].unique().tolist()),
+    default=sorted(df["Age Group"].unique().tolist())
 )
 
 # --- PREDICTION ---
@@ -148,21 +155,6 @@ def predict_daly(gender):
 if show_prediction:
     if show_male: predict_daly("Male")
     if show_female: predict_daly("Female")
-
-
-# Accuracy R2 SCORE
-from sklearn.metrics import r2_score
-
-if show_prediction:
-    st.markdown("### 📏 Prediction Quality (R² Score)")
-
-    if show_male and "DALY Male 2025" in df:
-        r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
-        st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
-
-    if show_female and "DALY Female 2025" in df:
-        r2_female = r2_score(df["DALY Female"], df["DALY Female 2025"])
-        st.markdown(f"🟣 **Female R² Score**: `{r2_female:.2f}`")
 
 # --- TABS ---
 tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧠 ML Insights", "📦 Data & Tools"])
@@ -181,6 +173,9 @@ with tab1:
         pred_avg = df[[c for c in df.columns if '2025' in c]].mean().mean()
         col3.metric("🔮 Avg Predicted 2025", f"{pred_avg:,.0f}")
 
+    if not show_male and not show_female:
+        st.warning("⚠️ Please select at least one gender to display the charts.")
+    
     # --- CHART ---
     st.markdown("### 📈 DALY by Age Group")
     fig = go.Figure()
@@ -196,7 +191,9 @@ with tab1:
         if show_male and "DALY Male 2025" in df: add_trace("Male 2025", df["DALY Male 2025"], "orange", "dash")
         if show_female and "DALY Female 2025" in df: add_trace("Female 2025", df["DALY Female 2025"], "red", "dash")
 
-    fig.update_layout(title="DALY by Age Group", hovermode="x unified", height=500,
+    fig.update_layout(title="DALY by Age Group", hovermode="x unified", height=500, plot_bgcolor="#2E0F15",
+    paper_bgcolor="#2E0F15",
+    font_color="#FAFFF0",
                       xaxis_title="Age Group", yaxis_title="DALY",
                       legend=dict(orientation="h"))
     fig.update_traces(marker=dict(size=6), selector=dict(mode='lines+markers'))
@@ -214,31 +211,45 @@ with tab1:
 
 # --- TAB 2: ML INSIGHTS ---
 with tab2:
-    st.subheader("📌 Anomaly Detection")
+    st.subheader("🤖 Machine Learning Insights")
+
+    with st.expander("🧠 What Is Machine Learning Doing Here?"):
+        st.markdown("""
+        Machine Learning helps us predict future DALY (Disability-Adjusted Life Years) values for epilepsy by learning from past data.
+
+        This dashboard uses **Linear Regression**:
+        - It draws a trend line from past data (2015 to 2019)
+        - It then extends the line to predict values for **2025**
+
+        The goal is to help public health teams understand future risk and prepare better.
+        """)
+
+    # --- R² Score ---
+    if show_prediction:
+        st.markdown("### 📏 Prediction Accuracy (R² Score)")
+        if show_male and "DALY Male 2025" in df:
+            r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
+            st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
+        if show_female and "DALY Female 2025" in df:
+            r2_female = r2_score(df["DALY Female"], df["DALY Female 2025"])
+            st.markdown(f"🟣 **Female R² Score**: `{r2_female:.2f}`")
+
+    # --- Anomaly Detection ---
+    st.markdown("### ❗ Anomaly Detection")
     def anomaly(column, label):
         score = zscore(df[column])
         idx = np.argmax(np.abs(score))
-        return f"🔍 **{label} anomaly:** {df.loc[idx, 'Age Group']} — {df.loc[idx, column]:,.0f} DALY"
+        return f"🔍 **{label} anomaly**: {df.loc[idx, 'Age Group']} — {df.loc[idx, column]:,.0f} DALY"
 
-    if show_male: st.markdown(anomaly("DALY Male", "Male"))
-    if show_female: st.markdown(anomaly("DALY Female", "Female"))
+    if show_male:
+        st.markdown(anomaly("DALY Male", "🔵 Male"))
+    if show_female:
+        st.markdown(anomaly("DALY Female", "🟣 Female"))
     if show_prediction and "DALY Male 2025" in df:
         st.markdown(f"📊 Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
 
-    if show_cluster:
-        st.subheader("🧬 Clustering")
-        cluster_data = df[["DALY Male", "DALY Female"]].dropna()
-        kmeans = KMeans(n_clusters=3, n_init="auto").fit(cluster_data)
-        df["Cluster"] = kmeans.labels_
-        cluster_fig = px.scatter(df, x="DALY Male", y="DALY Female", color="Cluster", title="Gender DALY Clustering")
-        st.plotly_chart(cluster_fig, use_container_width=True)
-
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
+    # --- Correlation Heatmap ---
     st.markdown("### 🔥 Correlation Heatmap")
-
-    # Only include relevant numeric columns
     heatmap_data = df.select_dtypes(include=[np.number])
     corr = heatmap_data.corr()
 
@@ -246,6 +257,7 @@ with tab2:
     sns.heatmap(corr, annot=True, cmap="Reds", fmt=".2f", ax=ax)
     st.pyplot(fig)
 
+    # --- Distribution Chart ---
     st.markdown("### 📊 Distribution of DALY by Gender")
     fig2 = go.Figure()
     if show_male:
@@ -277,8 +289,6 @@ with tab3:
     st.dataframe(df.style.format(precision=0))
 
 # --- BONUS: NATURAL LANGUAGE Q&A ---
-from langchain_experimental.agents import create_pandas_dataframe_agent
-from langchain.chat_models import ChatOpenAI
 
 with st.expander("🗣️ Ask NeuroPulse AI"):
     query = st.text_input("Ask anything about the data...")
