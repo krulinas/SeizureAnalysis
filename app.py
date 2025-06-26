@@ -89,10 +89,10 @@ st.markdown("""
 
 
 # --- HEADER ---
-st.markdown("<h1>🧠 NeuroPulse++</h1>", unsafe_allow_html=True)
+st.markdown("<h1>NeuroPulse++</h1>", unsafe_allow_html=True)
 st.markdown("AI-powered dashboard for epilepsy DALY prediction, clustering, and human insight.")
-st.caption("📊 Source: WHO Global Health Estimates (2019)")
-with st.expander("ℹ️ About This Dashboard"):
+st.caption("Source: WHO Global Health Estimates (2019)")
+with st.expander("About This Dashboard"):
     st.markdown("""
     **What is Epilepsy?**  
     Epilepsy is a brain disorder that causes repeated seizures. Seizures are sudden bursts of electrical activity in the brain that can affect behavior, movement, or awareness.
@@ -116,18 +116,17 @@ with st.expander("ℹ️ About This Dashboard"):
 st.markdown("---")
 
 # --- SIDEBAR CONTROLS ---
-st.sidebar.title("⚙️ Settings")
+st.sidebar.title("Settings")
 st.sidebar.markdown("""
 <div style='font-size:16px; font-weight:bold; color:#FF9FA2; padding: 6px 0;'>
-🎨 Theme: Premium Coral Red
 </div>
 """, unsafe_allow_html=True)
 
-show_male = st.sidebar.checkbox("👨 Show Male", True)
-show_female = st.sidebar.checkbox("👩 Show Female", True)
-show_prediction = st.sidebar.checkbox("🔮 Show 2025 Prediction", True)
-show_cluster = st.sidebar.checkbox("🧬 Cluster Analysis", False)
-chart_style = st.sidebar.radio("📈 Chart Style", ["Line", "Bar"])
+show_male = st.sidebar.checkbox("Show Male", True)
+show_female = st.sidebar.checkbox("Show Female", True)
+show_prediction = st.sidebar.checkbox("Show 2025 Prediction", True)
+show_cluster = st.sidebar.checkbox("Cluster Analysis", False)
+chart_style = st.sidebar.radio("Chart Style", ["Line", "Bar"])
 
 # --- DATA LOAD & PREP ---
 def load_data():
@@ -160,27 +159,27 @@ if show_prediction:
     if show_female: predict_daly("Female")
 
 # --- TABS ---
-tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧠 ML Insights", "📦 Data & Tools"])
+tab1, tab2, tab3 = st.tabs(["Dashboard", "ML Insights", "Data & Tools"])
 
 # --- TAB 1: MAIN DASHBOARD ---
 with tab1:
-    st.subheader("📌 Key Metrics")
+    st.subheader("Key Metrics")
     col1, col2, col3 = st.columns(3)
     if show_male:
         peak = df["DALY Male"].idxmax()
-        col1.metric("👨 Peak Male DALY", f"{df['DALY Male'].max():,.0f}", df.loc[peak, "Age Group"])
+        col1.metric("Peak Male DALY", f"{df['DALY Male'].max():,.0f}", df.loc[peak, "Age Group"])
     if show_female:
         peak = df["DALY Female"].idxmax()
-        col2.metric("👩 Peak Female DALY", f"{df['DALY Female'].max():,.0f}", df.loc[peak, "Age Group"])
+        col2.metric("Peak Female DALY", f"{df['DALY Female'].max():,.0f}", df.loc[peak, "Age Group"])
     if show_prediction:
         pred_avg = df[[c for c in df.columns if '2025' in c]].mean().mean()
         col3.metric("🔮 Avg Predicted 2025", f"{pred_avg:,.0f}")
 
     if not show_male and not show_female:
-        st.warning("⚠️ Please select at least one gender to display the charts.")
+        st.warning("Please select at least one gender to display the charts.")
     
     # --- CHART ---
-    st.markdown("### 📈 DALY by Age Group")
+    st.markdown("### DALY by Age Group")
     fig = go.Figure()
 
     def add_trace(label, y_data, color, dash="solid"):
@@ -214,9 +213,9 @@ with tab1:
 
 # --- TAB 2: ML INSIGHTS ---
 with tab2:
-    st.subheader("🤖 Machine Learning Insights")
+    st.subheader("Machine Learning Insights")
 
-    with st.expander("🧠 What Is Machine Learning Doing Here?"):
+    with st.expander("What Is Machine Learning Doing Here?"):
         st.markdown("""
         Machine Learning helps us predict future DALY (Disability-Adjusted Life Years) values for epilepsy by learning from past data.
 
@@ -229,7 +228,7 @@ with tab2:
 
     # --- R² Score ---
     if show_prediction:
-        st.markdown("### 📏 Prediction Accuracy (R² Score)")
+        st.markdown("###Prediction Accuracy (R² Score)")
         if show_male and "DALY Male 2025" in df:
             r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
             st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
@@ -238,7 +237,7 @@ with tab2:
             st.markdown(f"🟣 **Female R² Score**: `{r2_female:.2f}`")
 
     # --- Anomaly Detection ---
-    st.markdown("### ❗ Anomaly Detection")
+    st.markdown("###Anomaly Detection")
     def anomaly(column, label):
         score = zscore(df[column])
         idx = np.argmax(np.abs(score))
@@ -249,9 +248,9 @@ with tab2:
     if show_female:
         st.markdown(anomaly("DALY Female", "🟣 Female"))
     if show_prediction and "DALY Male 2025" in df:
-        st.markdown(f"📊 Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
+        st.markdown(f"Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
     if show_cluster:
-        st.markdown("### 🧬 K-Means Cluster Analysis")
+        st.markdown("###K-Means Cluster Analysis")
         
         if len(selected_group) >= 3:
             filtered_df = df[df["Age Group"].isin(selected_group)]
@@ -270,11 +269,11 @@ with tab2:
             )
             st.plotly_chart(fig_cluster, use_container_width=True)
         else:
-            st.warning("⚠️ Please select at least 3 age groups for meaningful clustering.")
+            st.warning("Please select at least 3 age groups for meaningful clustering.")
 
 
     # --- Correlation Heatmap ---
-    st.markdown("### 🔥 Correlation Heatmap")
+    st.markdown("###Correlation Heatmap")
     heatmap_data = df.select_dtypes(include=[np.number])
     corr = heatmap_data.corr()
 
@@ -283,7 +282,7 @@ with tab2:
     st.pyplot(fig)
 
     # --- Distribution Chart ---
-    st.markdown("### 📊 Distribution of DALY by Gender")
+    st.markdown("###Distribution of DALY by Gender")
     fig2 = go.Figure()
     if show_male:
         fig2.add_trace(go.Box(y=df["DALY Male"], name="Male", boxpoints="all", marker_color="blue"))
@@ -293,7 +292,7 @@ with tab2:
     st.plotly_chart(fig2, use_container_width=True)
 
     # --- Trend Forecasting Line Chart ---
-    st.markdown("### 📈 Trend Forecast: 2015 → 2019 → 2025")
+    st.markdown("###Trend Forecast: 2015 → 2019 → 2025")
     fig_trend = go.Figure()
     years = [2015, 2019, 2025]
 
@@ -311,35 +310,35 @@ with tab2:
 
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
-    st.subheader("📤 Upload Custom CSV")
+    st.subheader("Upload Custom CSV")
     uploaded = st.file_uploader("Upload your DALY CSV", type="csv")
     if uploaded:
         user_df = pd.read_csv(uploaded)
-        st.success("✅ File uploaded successfully!")
+        st.success("File uploaded successfully!")
         st.dataframe(user_df.head())
 
-    st.subheader("📥 Export")
+    st.subheader("Export")
     col1, col2 = st.columns(2)
     with col1:
-        st.download_button("⬇️ Download CSV", df.to_csv(index=False), file_name="neuropulse_data.csv")
+        st.download_button("Download CSV", df.to_csv(index=False), file_name="neuropulse_data.csv")
     with col2:
         img = BytesIO()
         try:
             pio.write_image(fig, img, format="png")
-            st.download_button("🖼️ Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
+            st.download_button("Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
         except Exception as e:
-            st.error("❌ Could not export image. Make sure 'kaleido' is installed in your environment.")
+            st.error("Could not export image. Make sure 'kaleido' is installed in your environment.")
             st.code(str(e))
 
-            st.subheader("🔎 View Full Data Table")
+            st.subheader("View Full Data Table")
             st.dataframe(df.style.format(precision=0))
 
 # --- BONUS: NATURAL LANGUAGE Q&A ---
 
-with st.expander("🗣️ Ask NeuroPulse AI"):
+with st.expander("Ask NeuroPulse AI"):
     query = st.text_input("Ask anything about the data...")
     if query:
         os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
         agent = create_pandas_dataframe_agent(ChatOpenAI(model="gpt-3.5-turbo"), df, verbose=False)
-        with st.spinner("🤖 Thinking..."):
+        with st.spinner("sThinking..."):
             st.success(agent.run(query))
