@@ -4,7 +4,7 @@ scikit-learn
 plotly
 numpy
 scipy
-kaleido
+kaleido==0.2.1
 openai
 langchain
 langchain-experimental

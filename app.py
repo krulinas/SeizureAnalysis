@@ -285,11 +285,15 @@ with tab3:
         st.download_button("⬇️ Download CSV", df.to_csv(index=False), file_name="neuropulse_data.csv")
     with col2:
         img = BytesIO()
-        pio.write_image(fig, img, format="png")
-        st.download_button("🖼️ Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
+        try:
+            pio.write_image(fig, img, format="png")
+            st.download_button("🖼️ Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
+        except Exception as e:
+            st.error("❌ Could not export image. Make sure 'kaleido' is installed in your environment.")
+            st.code(str(e))
 
-    st.subheader("🔎 View Full Data Table")
-    st.dataframe(df.style.format(precision=0))
+            st.subheader("🔎 View Full Data Table")
+            st.dataframe(df.style.format(precision=0))
 
 # --- BONUS: NATURAL LANGUAGE Q&A ---
 
