@@ -252,12 +252,26 @@ with tab2:
         st.markdown(f"📊 Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
     if show_cluster:
         st.markdown("### 🧬 K-Means Cluster Analysis")
-        features = df[["DALY Male", "DALY Female"]]
-        kmeans = KMeans(n_clusters=3, random_state=42).fit(features)
-        df["Cluster"] = kmeans.labels_
-        fig_cluster = px.scatter(df, x="DALY Male", y="DALY Female", color=df["Cluster"].astype(str),
-                                hover_name="Age Group", title="Clusters Based on DALY (Male vs Female)")
-        st.plotly_chart(fig_cluster, use_container_width=True)
+        
+        if len(selected_group) >= 3:
+            filtered_df = df[df["Age Group"].isin(selected_group)]
+            features = filtered_df[["DALY Male", "DALY Female"]]
+
+            kmeans = KMeans(n_clusters=3, random_state=42).fit(features)
+            filtered_df["Cluster"] = kmeans.labels_
+
+            fig_cluster = px.scatter(
+                filtered_df,
+                x="DALY Male",
+                y="DALY Female",
+                color=filtered_df["Cluster"].astype(str),
+                hover_name="Age Group",
+                title="Clusters Based on DALY (Male vs Female)"
+            )
+            st.plotly_chart(fig_cluster, use_container_width=True)
+        else:
+            st.warning("⚠️ Please select at least 3 age groups for meaningful clustering.")
+
 
     # --- Correlation Heatmap ---
     st.markdown("### 🔥 Correlation Heatmap")
