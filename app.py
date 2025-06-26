@@ -250,6 +250,14 @@ with tab2:
         st.markdown(anomaly("DALY Female", "🟣 Female"))
     if show_prediction and "DALY Male 2025" in df:
         st.markdown(f"📊 Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
+    if show_cluster:
+        st.markdown("### 🧬 K-Means Cluster Analysis")
+        features = df[["DALY Male", "DALY Female"]]
+        kmeans = KMeans(n_clusters=3, random_state=42).fit(features)
+        df["Cluster"] = kmeans.labels_
+        fig_cluster = px.scatter(df, x="DALY Male", y="DALY Female", color=df["Cluster"].astype(str),
+                                hover_name="Age Group", title="Clusters Based on DALY (Male vs Female)")
+        st.plotly_chart(fig_cluster, use_container_width=True)
 
     # --- Correlation Heatmap ---
     st.markdown("### 🔥 Correlation Heatmap")
@@ -269,6 +277,23 @@ with tab2:
         fig2.add_trace(go.Box(y=df["DALY Female"], name="Female", boxpoints="all", marker_color="violet"))
 
     st.plotly_chart(fig2, use_container_width=True)
+
+    # --- Trend Forecasting Line Chart ---
+    st.markdown("### 📈 Trend Forecast: 2015 → 2019 → 2025")
+    fig_trend = go.Figure()
+    years = [2015, 2019, 2025]
+
+    for i in range(len(df)):
+        age = df.loc[i, "Age Group"]
+        if show_male:
+            y_male = [df.loc[i, "DALY Male 2015"], df.loc[i, "DALY Male"], df.loc[i, "DALY Male 2025"]]
+            fig_trend.add_trace(go.Scatter(x=years, y=y_male, name=f"{age} Male", line=dict(dash='solid')))
+        if show_female:
+            y_female = [df.loc[i, "DALY Female 2015"], df.loc[i, "DALY Female"], df.loc[i, "DALY Female 2025"]]
+            fig_trend.add_trace(go.Scatter(x=years, y=y_female, name=f"{age} Female", line=dict(dash='dot')))
+
+    fig_trend.update_layout(title="DALY Forecast by Age Group", xaxis_title="Year", yaxis_title="DALY", height=600)
+    st.plotly_chart(fig_trend, use_container_width=True)
 
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
