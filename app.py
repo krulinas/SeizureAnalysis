@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.cluster import KMeans
 from sklearn.metrics import r2_score
 from scipy.stats import zscore
 import plotly.express as px
@@ -125,7 +124,6 @@ st.sidebar.markdown("""
 show_male = st.sidebar.checkbox("Show Male", True)
 show_female = st.sidebar.checkbox("Show Female", True)
 show_prediction = st.sidebar.checkbox("Show 2025 Prediction", True)
-show_cluster = st.sidebar.checkbox("Cluster Analysis", False)
 chart_style = st.sidebar.radio("Chart Style", ["Line", "Bar"])
 
 # --- DATA LOAD & PREP ---
@@ -137,12 +135,6 @@ def load_data():
     return df, age_groups
 
 df, age_groups = load_data()
-
-selected_group = st.sidebar.multiselect(
-    "🔎 Filter by Age Group",
-    options=sorted(df["Age Group"].unique().tolist()),
-    default=sorted(df["Age Group"].unique().tolist())
-)
 
 # --- PREDICTION ---
 def predict_daly(gender):
@@ -249,28 +241,6 @@ with tab2:
         st.markdown(anomaly("DALY Female", "🟣 Female"))
     if show_prediction and "DALY Male 2025" in df:
         st.markdown(f"Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
-    if show_cluster:
-        st.markdown("###K-Means Cluster Analysis")
-        
-        if len(selected_group) >= 3:
-            filtered_df = df[df["Age Group"].isin(selected_group)]
-            features = filtered_df[["DALY Male", "DALY Female"]]
-
-            kmeans = KMeans(n_clusters=3, random_state=42).fit(features)
-            filtered_df["Cluster"] = kmeans.labels_
-
-            fig_cluster = px.scatter(
-                filtered_df,
-                x="DALY Male",
-                y="DALY Female",
-                color=filtered_df["Cluster"].astype(str),
-                hover_name="Age Group",
-                title="Clusters Based on DALY (Male vs Female)"
-            )
-            st.plotly_chart(fig_cluster, use_container_width=True)
-        else:
-            st.warning("Please select at least 3 age groups for meaningful clustering.")
-
 
     # --- Correlation Heatmap ---
     st.markdown("###Correlation Heatmap")
@@ -330,8 +300,8 @@ with tab3:
             st.error("Could not export image. Make sure 'kaleido' is installed in your environment.")
             st.code(str(e))
 
-            st.subheader("View Full Data Table")
-            st.dataframe(df.style.format(precision=0))
+    st.subheader("View Full Data Table")
+    st.dataframe(df.style.format(precision=0))
 
 # --- BONUS: NATURAL LANGUAGE Q&A ---
 
