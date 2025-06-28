@@ -289,7 +289,7 @@ with tab2:
                 y=y_male,
                 name=f"{age} Male",
                 line=dict(dash='solid'),
-                hovertemplate=f"<b>{age} Male</b><br>Year: %{x}<br>DALY: %{y:,} <extra></extra>"
+                hovertemplate=f"<b>{age} Male</b><br>Year: %{{x}}<br>DALY: %{{y:,}} <extra></extra>"
             ))
         if show_female:
             y_female = [df.loc[i, "DALY Female 2015"], df.loc[i, "DALY Female"], df.loc[i, "DALY Female 2025"]]
