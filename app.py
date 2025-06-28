@@ -313,19 +313,6 @@ with tab3:
         st.success("File uploaded successfully!")
         st.dataframe(user_df.head())
 
-    st.subheader("Export")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.download_button("Download CSV", df.to_csv(index=False), file_name="neuropulse_data.csv")
-    with col2:
-        img = BytesIO()
-        try:
-            pio.write_image(fig, img, format="png")
-            st.download_button("Download Chart (PNG)", img.getvalue(), "neuropulse_chart.png", "image/png")
-        except Exception as e:
-            st.error("Could not export image. Make sure 'kaleido' is installed in your environment.")
-            st.code(str(e))
-
     st.subheader("View Full Data Table")
     st.dataframe(df.style.format(precision=0))
 
