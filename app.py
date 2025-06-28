@@ -125,6 +125,35 @@ show_male = st.sidebar.checkbox("Show Male", True)
 show_female = st.sidebar.checkbox("Show Female", True)
 show_prediction = st.sidebar.checkbox("Show 2025 Prediction", True)
 chart_style = st.sidebar.radio("Chart Style", ["Line", "Bar"])
+show_guided_tips = st.sidebar.toggle("Show Guided Tips", value=False)
+
+def explain(section):
+    if not show_guided_tips:
+        return
+    explanations = {
+        "daly_chart": "This chart shows DALY (years of healthy life lost) for each age group. Higher = more impact.",
+        "radar": "Compares DALY for males and females across age groups. Wider = greater impact.",
+        "r2": "R² Score shows how accurate our prediction is. 1.0 = perfect, 0 = no match.",
+        "anomaly": "Anomalies are age groups with unusually high or low health loss.",
+        "heatmap": "Correlation shows how values relate. 1.00 = strong link.",
+        "boxplot": "Each dot is an age group. Taller boxes = more variation.",
+        "trend": "Forecast shows how DALY may change from 2015 → 2025.",
+        "upload": "Upload a CSV file with epilepsy DALY data. We'll show the first few rows here.",
+        "med": "Educational info for seizure types and recommended treatments."
+    }
+    st.caption(explanations.get(section, ""))
+
+def insight(section):
+    if not show_guided_tips:
+        return
+    insights = {
+        "daly_chart": "Insight: Young adults (15–29) show the highest DALY in both genders.",
+        "radar": "Insight: DALY patterns are nearly parallel for both genders across age groups.",
+        "boxplot": "Insight: Female DALY values vary more widely than male.",
+        "trend": "Insight: Most age groups show stable or slightly decreasing DALY by 2025.",
+        "heatmap": "Insight: DALY values for male and female are highly correlated (~0.98).",
+    }
+    st.markdown(insights.get(section, ""))
 
 # --- DATA LOAD & PREP ---
 def load_data():
@@ -262,6 +291,13 @@ with tab2:
     sns.heatmap(corr, annot=True, cmap="Reds", fmt=".2f", ax=ax)
     st.pyplot(fig)
 
+    st.markdown("""Quick Summary
+    - **DALY** measures total health loss from epilepsy.
+    - **Higher numbers** mean more years of healthy life lost.
+    - **Most affected group**: 15–29 year olds.
+    - Future trends show **slight improvement** by 2025.
+    """)
+
     # --- Distribution Chart ---
     st.markdown("Distribution of DALY by Gender")
     fig2 = go.Figure()
@@ -318,11 +354,17 @@ with tab2:
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
     st.subheader("Upload Custom CSV")
-    uploaded = st.file_uploader("Upload your DALY CSV", type="csv")
+    st.caption("Upload a CSV with similar structure to our DALY dataset. We'll show the first few rows.")
+
+    uploaded = st.file_uploader("Choose a CSV file", type="csv")
     if uploaded:
-        user_df = pd.read_csv(uploaded)
-        st.success("File uploaded successfully!")
-        st.dataframe(user_df.head())
+        try:
+            user_df = pd.read_csv(uploaded)
+            st.success("File uploaded successfully!")
+            st.dataframe(user_df.head())
+        except Exception as e:
+            st.error("Failed to load CSV. Please make sure it's properly formatted.")
+            st.code(str(e))
 
     st.subheader("View Full Data Table")
     st.dataframe(df.style.format(precision=0))
@@ -352,7 +394,12 @@ with tab4:
     st.table(med_df)
 
     st.markdown("Find Pharmacies Nearby")
-    st.markdown("[Open in Google Maps](https://www.google.com/maps/search/pharmacy+near+me+epilepsy/)")
+    scol1, col2 = st.columns([1, 5])
+    with col1:
+        st.image("https://cdn-icons-png.flaticon.com/512/3176/3176367.png", width=40)  # or use a local icon
+    with col2:
+        if st.button("🔎 Open in Google Maps"):
+            st.markdown("[Click here to search pharmacies near you](https://www.google.com/maps/search/epilepsy+medication+pharmacy+near+me)", unsafe_allow_html=True)
 
     st.markdown("Doctor Advice Highlights")
     st.markdown("""
