@@ -171,7 +171,7 @@ with tab1:
         st.warning("Please select at least one gender to display the charts.")
     
     # --- CHART ---
-    st.markdown("### DALY by Age Group")
+    st.markdown("DALY by Age Group")
     fig = go.Figure()
 
     def add_trace(label, y_data, color, dash="solid"):
@@ -195,7 +195,7 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- RADAR CHART ---
-    st.markdown("### 🕸️ DALY Distribution Radar")
+    st.markdown("DALY Distribution Radar")
     radar_df = df[["Age Group", "DALY Male", "DALY Female"]].set_index("Age Group")
     fig_radar = go.Figure()
     for col in radar_df.columns:
@@ -220,7 +220,7 @@ with tab2:
 
     # --- R² Score ---
     if show_prediction:
-        st.markdown("###Prediction Accuracy (R² Score)")
+        st.markdown("Prediction Accuracy (R² Score)")
         if show_male and "DALY Male 2025" in df:
             r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
             st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
@@ -229,7 +229,7 @@ with tab2:
             st.markdown(f"🟣 **Female R² Score**: `{r2_female:.2f}`")
 
     # --- Anomaly Detection ---
-    st.markdown("###Anomaly Detection")
+    st.markdown("Anomaly Detection")
     def anomaly(column, label):
         score = zscore(df[column])
         idx = np.argmax(np.abs(score))
@@ -243,7 +243,7 @@ with tab2:
         st.markdown(f"Predicted DALY peak in **{df.loc[df['DALY Male 2025'].idxmax(), 'Age Group']}**")
 
     # --- Correlation Heatmap ---
-    st.markdown("###Correlation Heatmap")
+    st.markdown("Correlation Heatmap")
     heatmap_data = df.select_dtypes(include=[np.number])
     corr = heatmap_data.corr()
 
@@ -252,7 +252,7 @@ with tab2:
     st.pyplot(fig)
 
     # --- Distribution Chart ---
-    st.markdown("###Distribution of DALY by Gender")
+    st.markdown("Distribution of DALY by Gender")
     fig2 = go.Figure()
     if show_male:
         fig2.add_trace(go.Box(
@@ -276,7 +276,7 @@ with tab2:
     st.plotly_chart(fig2, use_container_width=True)
 
     # --- Trend Forecasting Line Chart ---
-    st.markdown("###Trend Forecast: 2015 → 2019 → 2025")
+    st.markdown("Trend Forecast: 2015 → 2019 → 2025")
     fig_trend = go.Figure()
     years = [2015, 2019, 2025]
 
