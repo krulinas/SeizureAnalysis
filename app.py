@@ -185,11 +185,22 @@ with tab1:
         if show_male and "DALY Male 2025" in df: add_trace("Male 2025", df["DALY Male 2025"], "orange", "dash")
         if show_female and "DALY Female 2025" in df: add_trace("Female 2025", df["DALY Female 2025"], "red", "dash")
 
-    fig.update_layout(title="DALY by Age Group", hovermode="x unified", height=500, plot_bgcolor="#2E0F15",
-    paper_bgcolor="#2E0F15",
-    font_color="#FAFFF0",
-                      xaxis_title="Age Group", yaxis_title="DALY",
-                      legend=dict(orientation="h"))
+    fig.update_layout(
+        title="DALY by Age Group", 
+        hovermode="x unified", 
+        height=500, 
+        plot_bgcolor="#2E0F15",
+        paper_bgcolor="#2E0F15",
+        font_color="#FAFFF0",
+        xaxis_title="Age Group", yaxis_title="DALY",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5
+        )
+    )
     fig.update_traces(marker=dict(size=6), selector=dict(mode='lines+markers'))
     fig.update_layout(transition_duration=500)
     st.plotly_chart(fig, use_container_width=True)
@@ -328,7 +339,6 @@ with tab4:
     """)
 
     st.markdown("Recommended Medications by Stage")
-
     med_data = {
         "Stage": ["Initial Diagnosis", "Mild/Occasional Seizures", "Frequent or Severe Seizures", "Drug-resistant Epilepsy"],
         "Medications": [
@@ -338,9 +348,11 @@ with tab4:
             "Ketogenic diet, Vagus nerve stimulation (VNS), Surgery"
         ]
     }
-
     med_df = pd.DataFrame(med_data)
     st.table(med_df)
+
+    st.markdown("Find Pharmacies Nearby")
+    st.markdown("[Open in Google Maps](https://www.google.com/maps/search/pharmacy+near+me+epilepsy/)")
 
     st.markdown("Doctor Advice Highlights")
     st.markdown("""
