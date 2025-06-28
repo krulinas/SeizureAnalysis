@@ -325,3 +325,40 @@ with st.expander("Ask NeuroPulse AI"):
         agent = create_pandas_dataframe_agent(ChatOpenAI(model="gpt-3.5-turbo"), df, verbose=False)
         with st.spinner("sThinking..."):
             st.success(agent.run(query))
+
+# --- TAB 4: MEDICAL GUIDELINES ---
+with tab4:
+    st.subheader("Doctor Recommendations & Medicine Info")
+    st.markdown("This section provides general guidance for epilepsy patients and caregivers. Please consult a licensed physician for diagnosis and treatment.")
+
+    st.markdown("Common Seizure Types")
+    st.markdown("""
+    - **Focal (Partial) Seizures**: Affect one part of the brain. May cause twitching or confusion.
+    - **Generalized Seizures**: Affect both sides. Includes tonic-clonic (grand mal), absence, and atonic seizures.
+    """)
+
+    st.markdown("Recommended Medications by Stage")
+
+    med_data = {
+        "Stage": ["Initial Diagnosis", "Mild/Occasional Seizures", "Frequent or Severe Seizures", "Drug-resistant Epilepsy"],
+        "Medications": [
+            "Carbamazepine, Lamotrigine",
+            "Valproate, Levetiracetam",
+            "Topiramate, Clobazam",
+            "Ketogenic diet, Vagus nerve stimulation (VNS), Surgery"
+        ]
+    }
+
+    med_df = pd.DataFrame(med_data)
+    st.table(med_df)
+
+    st.markdown("Doctor Advice Highlights")
+    st.markdown("""
+    - Take medications consistently at the same time every day.
+    - Avoid triggers like sleep deprivation, flashing lights, or alcohol.
+    - Keep a **seizure diary** for tracking episodes.
+    - Inform close contacts about first-aid steps during a seizure.
+    - Never stop medication without medical advice.
+    """)
+
+    st.info("This content is educational and not a substitute for medical advice.")
