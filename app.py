@@ -298,7 +298,7 @@ with tab2:
                 y=y_female,
                 name=f"{age} Female",
                 line=dict(dash='dot'),
-                hovertemplate=f"<b>{age} Female</b><br>Year: %{x}<br>DALY: %{y:,} <extra></extra>"
+                hovertemplate=f"<b>{age} Female</b><br>Year: %{{x}}<br>DALY: %{{y:,}} <extra></extra>"
             ))
 
     fig_trend.update_layout(title="DALY Forecast by Age Group", xaxis_title="Year", yaxis_title="DALY", height=600)
