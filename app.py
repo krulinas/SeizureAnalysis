@@ -6,9 +6,6 @@ from sklearn.metrics import r2_score
 from scipy.stats import zscore
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.io as pio
-from io import BytesIO
-import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 from langchain_experimental.agents import create_pandas_dataframe_agent
@@ -201,6 +198,7 @@ with tab1:
     
     # --- CHART ---
     st.markdown("DALY by Age Group")
+    explain("daly_chart")
     fig = go.Figure()
 
     def add_trace(label, y_data, color, dash="solid"):
@@ -233,15 +231,18 @@ with tab1:
     fig.update_traces(marker=dict(size=6), selector=dict(mode='lines+markers'))
     fig.update_layout(transition_duration=500)
     st.plotly_chart(fig, use_container_width=True)
+    insight("daly_chart")
 
     # --- RADAR CHART ---
     st.markdown("DALY Distribution Radar")
+    explain("radar")
     radar_df = df[["Age Group", "DALY Male", "DALY Female"]].set_index("Age Group")
     fig_radar = go.Figure()
     for col in radar_df.columns:
         fig_radar.add_trace(go.Scatterpolar(r=radar_df[col], theta=radar_df.index, fill='toself', name=col))
     fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=True)
     st.plotly_chart(fig_radar, use_container_width=True)
+    insight("radar")
 
 # --- TAB 2: ML INSIGHTS ---
 with tab2:
@@ -261,6 +262,7 @@ with tab2:
     # --- R² Score ---
     if show_prediction:
         st.markdown("Prediction Accuracy (R² Score)")
+        explain("r2")
         if show_male and "DALY Male 2025" in df:
             r2_male = r2_score(df["DALY Male"], df["DALY Male 2025"])
             st.markdown(f"🔵 **Male R² Score**: `{r2_male:.2f}`")
@@ -270,6 +272,7 @@ with tab2:
 
     # --- Anomaly Detection ---
     st.markdown("Anomaly Detection")
+    explain("anomaly")
     def anomaly(column, label):
         score = zscore(df[column])
         idx = np.argmax(np.abs(score))
@@ -284,6 +287,7 @@ with tab2:
 
     # --- Correlation Heatmap ---
     st.markdown("Correlation Heatmap")
+    explain("heatmap")
     heatmap_data = df.select_dtypes(include=[np.number])
     corr = heatmap_data.corr()
 
@@ -321,6 +325,7 @@ with tab2:
         ))
 
     st.plotly_chart(fig2, use_container_width=True)
+    insight("boxplot")
 
     # --- Trend Forecasting Line Chart ---
     st.markdown("Trend Forecast: 2015 → 2019 → 2025")
@@ -350,6 +355,7 @@ with tab2:
 
     fig_trend.update_layout(title="DALY Forecast by Age Group", xaxis_title="Year", yaxis_title="DALY", height=600)
     st.plotly_chart(fig_trend, use_container_width=True)
+    insight("trend")
 
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
