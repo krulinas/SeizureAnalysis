@@ -316,16 +316,6 @@ with tab3:
     st.subheader("View Full Data Table")
     st.dataframe(df.style.format(precision=0))
 
-# --- BONUS: NATURAL LANGUAGE Q&A ---
-
-with st.expander("Ask NeuroPulse AI"):
-    query = st.text_input("Ask anything about the data...")
-    if query:
-        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-        agent = create_pandas_dataframe_agent(ChatOpenAI(model="gpt-3.5-turbo"), df, verbose=False)
-        with st.spinner("sThinking..."):
-            st.success(agent.run(query))
-
 # --- TAB 4: MEDICAL GUIDELINES ---
 with tab4:
     st.subheader("Doctor Recommendations & Medicine Info")
