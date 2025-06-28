@@ -151,7 +151,7 @@ if show_prediction:
     if show_female: predict_daly("Female")
 
 # --- TABS ---
-tab1, tab2, tab3 = st.tabs(["Dashboard", "ML Insights", "Data & Tools"])
+tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "ML Insights", "Data & Tools", "Medical Guidelines"])
 
 # --- TAB 1: MAIN DASHBOARD ---
 with tab1:
