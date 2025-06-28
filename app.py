@@ -255,9 +255,23 @@ with tab2:
     st.markdown("###Distribution of DALY by Gender")
     fig2 = go.Figure()
     if show_male:
-        fig2.add_trace(go.Box(y=df["DALY Male"], name="Male", boxpoints="all", marker_color="blue"))
+        fig2.add_trace(go.Box(
+            y=df["DALY Male"],
+            name="Male",
+            boxpoints="all",
+            marker_color="blue",
+            hoverinfo="y",
+            hovertemplate="Male DALY: %{y:,} <extra></extra>"
+        ))
     if show_female:
-        fig2.add_trace(go.Box(y=df["DALY Female"], name="Female", boxpoints="all", marker_color="violet"))
+        fig2.add_trace(go.Box(
+            y=df["DALY Female"],
+            name="Female",
+            boxpoints="all",
+            marker_color="violet",
+            hoverinfo="y",
+            hovertemplate="Female DALY: %{y:,} <extra></extra>"
+        ))
 
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -270,10 +284,22 @@ with tab2:
         age = df.loc[i, "Age Group"]
         if show_male:
             y_male = [df.loc[i, "DALY Male 2015"], df.loc[i, "DALY Male"], df.loc[i, "DALY Male 2025"]]
-            fig_trend.add_trace(go.Scatter(x=years, y=y_male, name=f"{age} Male", line=dict(dash='solid')))
+            fig_trend.add_trace(go.Scatter(
+                x=years,
+                y=y_male,
+                name=f"{age} Male",
+                line=dict(dash='solid'),
+                hovertemplate=f"<b>{age} Male</b><br>Year: %{x}<br>DALY: %{y:,} <extra></extra>"
+            ))
         if show_female:
             y_female = [df.loc[i, "DALY Female 2015"], df.loc[i, "DALY Female"], df.loc[i, "DALY Female 2025"]]
-            fig_trend.add_trace(go.Scatter(x=years, y=y_female, name=f"{age} Female", line=dict(dash='dot')))
+            fig_trend.add_trace(go.Scatter(
+                x=years,
+                y=y_female,
+                name=f"{age} Female",
+                line=dict(dash='dot'),
+                hovertemplate=f"<b>{age} Female</b><br>Year: %{x}<br>DALY: %{y:,} <extra></extra>"
+            ))
 
     fig_trend.update_layout(title="DALY Forecast by Age Group", xaxis_title="Year", yaxis_title="DALY", height=600)
     st.plotly_chart(fig_trend, use_container_width=True)
