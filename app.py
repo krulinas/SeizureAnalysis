@@ -4,12 +4,12 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from scipy.stats import zscore
-import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
 import matplotlib.pyplot as plt
 from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain.chat_models import ChatOpenAI
+from sklearn.cluster import KMeans
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="NeuroPulse++ | Epilepsy AI Dashboard", layout="wide")
@@ -121,6 +121,7 @@ st.sidebar.markdown("""
 show_male = st.sidebar.checkbox("Show Male", True)
 show_female = st.sidebar.checkbox("Show Female", True)
 show_prediction = st.sidebar.checkbox("Show 2025 Prediction", True)
+prediction_year = st.sidebar.slider("Select Prediction Year", min_value=2023, max_value=2030, value=2025)
 chart_style = st.sidebar.radio("Chart Style", ["Line", "Bar"])
 show_guided_tips = st.sidebar.toggle("Show Guided Tips", value=False)
 
@@ -163,18 +164,29 @@ def load_data():
 df, age_groups = load_data()
 
 # --- PREDICTION ---
-def predict_daly(gender):
+def predict_daly(gender, year):
     preds = []
     for i in range(len(df)):
         X = np.array([[2015], [2019]])
         y = np.array([df.loc[i, f'DALY {gender} 2015'], df.loc[i, f'DALY {gender}']])
         model = LinearRegression().fit(X, y)
-        preds.append(model.predict([[2025]])[0])
-    df[f'DALY {gender} 2025'] = preds
+        preds.append(model.predict([[year]])[0])
+    df[f'DALY {gender} {year}'] = preds
+
+def cluster_age_groups():
+    cluster_data = df[["DALY Male", "DALY Female"]].copy()
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    df["Cluster"] = kmeans.fit_predict(cluster_data)
+
+    cluster_severity = df.groupby("Cluster")[["DALY Male", "DALY Female"]].sum().sum(axis=1).sort_values()
+    severity_map = {old: new for new, old in enumerate(cluster_severity.index)}
+    df["Cluster"] = df["Cluster"].map(severity_map)
 
 if show_prediction:
-    if show_male: predict_daly("Male")
-    if show_female: predict_daly("Female")
+    if show_male: predict_daly("Male", prediction_year)
+    if show_female: predict_daly("Female", prediction_year)
+
+cluster_age_groups()
 
 # --- TABS ---
 tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "ML Insights", "Data & Tools", "Medical Guidelines"])
@@ -209,8 +221,10 @@ with tab1:
     if show_male: add_trace("Male 2019", df["DALY Male"], "blue")
     if show_female: add_trace("Female 2019", df["DALY Female"], "green")
     if show_prediction:
-        if show_male and "DALY Male 2025" in df: add_trace("Male 2025", df["DALY Male 2025"], "orange", "dash")
-        if show_female and "DALY Female 2025" in df: add_trace("Female 2025", df["DALY Female 2025"], "red", "dash")
+        if show_male and f"DALY Male {prediction_year}" in df:
+            add_trace(f"Male {prediction_year}", df[f"DALY Male {prediction_year}"], "orange", "dash")
+        if show_female and f"DALY Female {prediction_year}" in df:
+            add_trace(f"Female {prediction_year}", df[f"DALY Female {prediction_year}"], "red", "dash")
 
     fig.update_layout(
         title="DALY by Age Group", 
@@ -356,6 +370,103 @@ with tab2:
     fig_trend.update_layout(title="DALY Forecast by Age Group", xaxis_title="Year", yaxis_title="DALY", height=600)
     st.plotly_chart(fig_trend, use_container_width=True)
     insight("trend")
+
+    # --- K-Means Clustering ---
+    st.markdown("K-Means Clustering of Age Groups")
+    st.markdown("""
+        **Cluster Legend**
+        - 🟢 **Low Burden**
+        - 🟠 **Medium Burden**
+        - 🔴 **High Burden**
+        """)
+    st.caption("Age groups clustered based on DALY impact (2019, Male + Female).")
+
+    cluster_colors = {0: "green", 1: "orange", 2: "red"}
+    cluster_labels = df["Cluster"].map({0: "Low", 1: "Medium", 2: "High"})
+
+    fig_cluster = go.Figure()
+
+    fig_cluster.add_trace(go.Scatter(
+        x=df["DALY Male"],
+        y=df["DALY Female"],
+        customdata=df["Cluster Label"],
+        mode='markers+text',
+        text=df["Age Group"],
+        textposition="top center",
+        marker=dict(
+            size=12,
+            color=df["Cluster"].map(cluster_colors),
+            opacity=0.8,
+            line=dict(width=1, color="black")
+        ),
+        hovertemplate="Age: %{text}<br>Male: %{x:,}<br>Female: %{y:,}<br>Cluster: %{customdata}<extra></extra>"
+    ))
+
+    fig_cluster.update_layout(
+        xaxis_title="DALY Male (2019)",
+        yaxis_title="DALY Female (2019)",
+        title="K-Means Cluster of Age Groups by DALY",
+        height=500,
+        yaxis=dict(scaleanchor="x", scaleratio=1)
+    )
+
+    st.plotly_chart(fig_cluster, use_container_width=True)
+
+    # Optional: show cluster labels
+    df_display = df[["Age Group", "DALY Male", "DALY Female", "Cluster Label"]].copy()
+    df_display["Total DALY"] = df_display["DALY Male"] + df_display["DALY Female"]
+    st.dataframe(df_display.sort_values(["Cluster Label", "Total DALY"], ascending=[True, False]))
+    
+    # --- Dual Age Group ---
+    st.markdown("---")
+    st.subheader("Compare Two Age Groups")
+
+    age_options = df["Age Group"].tolist()
+    col1, col2 = st.columns(2)
+    age1 = col1.selectbox("Select First Age Group", age_options, index=0)
+    age2 = col2.selectbox("Select Second Age Group", age_options, index=1)
+
+    compare_df = df[df["Age Group"].isin([age1, age2])]
+
+    fig_cmp = go.Figure()
+
+    if show_male:
+        fig_cmp.add_trace(go.Bar(name=f"{age1} Male", x=["2015", "2019", str(prediction_year)],
+            y=[compare_df.loc[compare_df["Age Group"] == age1, "DALY Male 2015"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age1, "DALY Male"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age1, f"DALY Male {prediction_year}"].values[0]],
+            marker_color="blue"
+        ))
+        fig_cmp.add_trace(go.Bar(name=f"{age2} Male", x=["2015", "2019", str(prediction_year)],
+            y=[compare_df.loc[compare_df["Age Group"] == age2, "DALY Male 2015"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age2, "DALY Male"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age2, f"DALY Male {prediction_year}"].values[0]],
+            marker_color="lightblue"
+        ))
+
+    if show_female:
+        fig_cmp.add_trace(go.Bar(name=f"{age1} Female", x=["2015", "2019", str(prediction_year)],
+            y=[compare_df.loc[compare_df["Age Group"] == age1, "DALY Female 2015"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age1, "DALY Female"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age1, f"DALY Female {prediction_year}"].values[0]],
+            marker_color="violet"
+        ))
+        fig_cmp.add_trace(go.Bar(name=f"{age2} Female", x=["2015", "2019", str(prediction_year)],
+            y=[compare_df.loc[compare_df["Age Group"] == age2, "DALY Female 2015"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age2, "DALY Female"].values[0],
+            compare_df.loc[compare_df["Age Group"] == age2, f"DALY Female {prediction_year}"].values[0]],
+            marker_color="plum"
+        ))
+
+    fig_cmp.update_layout(
+        barmode='group',
+        title="DALY Comparison: Two Age Groups",
+        xaxis_title="Year",
+        yaxis_title="DALY",
+        height=500
+    )
+
+    st.plotly_chart(fig_cmp, use_container_width=True)
 
 # --- TAB 3: RAW DATA & TOOLS ---
 with tab3:
