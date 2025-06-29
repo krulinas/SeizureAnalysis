@@ -181,6 +181,7 @@ def cluster_age_groups():
     cluster_severity = df.groupby("Cluster")[["DALY Male", "DALY Female"]].sum().sum(axis=1).sort_values()
     severity_map = {old: new for new, old in enumerate(cluster_severity.index)}
     df["Cluster"] = df["Cluster"].map(severity_map)
+    df["Cluster Label"] = df["Cluster"].map({0: "Low", 1: "Medium", 2: "High"})
 
 if show_prediction:
     if show_male: predict_daly("Male", prediction_year)
